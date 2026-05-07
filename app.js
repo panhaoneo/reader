@@ -14,6 +14,17 @@ function cacheKey(text, cefr){ return `${cefr}::${btoa(unescape(encodeURICompone
 
 function renderText(text){ content.textContent = text.slice(0, 120000); }
 
+function escapeHtml(s){
+  return String(s)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
+function escapeRegex(s){ return String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); }
+
 async function parseEpub(file){
   const buf = await file.arrayBuffer();
   const book = ePub(buf);
@@ -95,11 +106,14 @@ async function analyze(text, cefr){
 
 function applyAnnotations(text, list, cefr){
   const threshold = CEFR_ORDER.indexOf(cefr);
-  let html = text;
+  let html = escapeHtml(text);
   for(const it of list){
     if(CEFR_ORDER.indexOf(it.level) <= threshold) continue;
-    const reg = new RegExp(`\\b(${it.word})\\b`,'gi');
-    html = html.replace(reg, `<span class="word" data-zh="${it.zh}">$1</span>`);
+    const safeWord = escapeRegex(it.word);
+    if(!safeWord) continue;
+    const reg = new RegExp(`\\b(${safeWord})\\b`,'gi');
+    const safeZh = escapeHtml(it.zh);
+    html = html.replace(reg, `<span class="word" data-zh="${safeZh}">$1</span>`);
   }
   content.innerHTML = html;
 }
