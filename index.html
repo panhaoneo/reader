@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>英文辅助阅读器</title>
+  <link rel="manifest" href="manifest.json" />
+  <style>
+    body {font-family: system-ui, sans-serif; margin:0; display:grid; grid-template-columns: 280px 1fr 320px; height:100vh;}
+    .panel{border-right:1px solid #ddd; padding:12px; overflow:auto}
+    .reader{padding:16px; overflow:auto; background:#faf9f7}
+    .right{border-left:1px solid #ddd; padding:12px; overflow:auto}
+    .toolbar{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px}
+    input,select,button{padding:8px}
+    .word {border-bottom:1px dotted #d08a2c; cursor:pointer; position:relative;}
+    .word:hover::after {content: attr(data-zh); position:absolute; top:1.5em; left:0; background:#333; color:#fff; padding:3px 6px; border-radius:4px; white-space:nowrap; z-index:3;}
+    #content{line-height:1.8; font-size:18px; white-space:pre-wrap}
+    @media (max-width: 900px) { body{grid-template-columns:1fr;} .panel,.right{border:0;border-bottom:1px solid #ddd;} }
+  </style>
+</head>
+<body>
+  <aside class="panel">
+    <h3>导入</h3>
+    <div class="toolbar">
+      <input type="file" id="fileInput" accept=".epub,.pdf,.html,.htm,.txt" />
+    </div>
+    <div class="toolbar">
+      <input id="urlInput" placeholder="输入网页/PDF URL" style="flex:1" />
+      <button id="loadUrl">加载</button>
+    </div>
+    <p>支持：EPUB / PDF / 网页。</p>
+  </aside>
+  <main class="reader">
+    <h2>沉浸式英文阅读</h2>
+    <div id="content">请上传文件或输入 URL。</div>
+  </main>
+  <aside class="right">
+    <h3>设置</h3>
+    <label>API Base <input id="apiBase" placeholder="https://api.openai.com/v1" /></label><br><br>
+    <label>API Key <input id="apiKey" type="password" placeholder="sk-..." /></label><br><br>
+    <label>Model <input id="model" value="gpt-4.1-mini" /></label><br><br>
+    <label>CEFR
+      <select id="cefr">
+        <option>A1</option><option>A2</option><option selected>B1</option><option>B2</option><option>C1</option><option>C2</option>
+      </select>
+    </label><br><br>
+    <button id="analyze">标注难词</button>
+    <p style="font-size:12px;color:#666">缓存：同一本书同一段落不会重复请求。</p>
+  </aside>
+
+<script src="https://cdn.jsdelivr.net/npm/epubjs/dist/epub.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pdfjs-dist@4.5.136/build/pdf.min.mjs" type="module"></script>
+<script type="module" src="app.js"></script>
+</body>
+</html>
